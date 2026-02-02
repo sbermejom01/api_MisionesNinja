@@ -12,6 +12,12 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
+app.get("/api", (req, res) => {
+  res.json({ mensaje: "API funcionando en Vercel 🚀" });
+});
+
+module.exports = app;
+
 // RANKS ordering for validation
 const RANKS = ['Academy', 'Genin', 'Chunin', 'Jonin', 'Kage'];
 const MISSION_RANKS = ['D', 'C', 'B', 'A', 'S'];
