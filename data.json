@@ -1,0 +1,331 @@
+{
+  "ninjas": [
+    {
+      "id": "1",
+      "username": "naruto",
+      "passwordHash": "$2a$10$7pM7vGfV5zM0YgO5V8hG8.9R4E0yv6y4U0V9U0V9U0V9U0V9U0V9",
+      "rank": "Genin",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=naruto",
+      "experiencePoints": 150
+    },
+    {
+      "id": "kakashi_id",
+      "username": "kakashi",
+      "passwordHash": "no_login",
+      "rank": "Jonin",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=kakashi",
+      "experiencePoints": 5000
+    },
+    {
+      "id": "sakura_id",
+      "username": "sakura",
+      "passwordHash": "no_login",
+      "rank": "Chunin",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=sakura",
+      "experiencePoints": 800
+    },
+    {
+      "id": "sasuke_id",
+      "username": "sasuke",
+      "passwordHash": "no_login",
+      "rank": "Jonin",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=sasuke",
+      "experiencePoints": 4500
+    },
+    {
+      "id": "5",
+      "username": "justo",
+      "passwordHash": "$2b$10$/qI6TXnkQWkoIzPdqirApeuKQgIgUA4b/YHgOg0xN5MZYB68fBnu.",
+      "rank": "Kage",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=justo",
+      "experiencePoints": 0
+    },
+    {
+      "id": "6",
+      "username": "kakashi_gaiden",
+      "passwordHash": "$2b$10$XVdnqJYDliTjeo.iy5Hr1OzVLBZeP1SfHxVGE2ARdsI5GHvo.WQXi",
+      "rank": "Jonin",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=kakashi_gaiden",
+      "experiencePoints": 0
+    },
+    {
+      "id": "7",
+      "username": "lorenzo",
+      "passwordHash": "$2b$10$CB/f1whOD/tkcPDTBUEhAeejWBCohQC3x6lbTrIz7z0Uut/aRKWkG",
+      "rank": "Kage",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=lorenzo",
+      "experiencePoints": 0
+    },
+    {
+      "id": "8",
+      "username": "aaa",
+      "passwordHash": "$2b$10$tisrYi0rt89N0Z/G6ls81O0Jj81IoL715e/sca79SMupc5HSMkCNq",
+      "rank": "Academy",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=aaa",
+      "experiencePoints": 0
+    },
+    {
+      "id": "9",
+      "username": "lorenzo6",
+      "passwordHash": "$2b$10$cI2Ul/bhQiirmA7Qq7u2H.WplZmWZdUntytZTI3.n7V2V5C.wObgG",
+      "rank": "Academy",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=lorenzo6",
+      "experiencePoints": 0
+    },
+    {
+      "id": "10",
+      "username": "lorenzo5",
+      "passwordHash": "$2b$10$FxTOCRUEZ2LI6qIykVDkoOFxXxpqvTWf7j1yeZt2dqN0pAR6ijEFq",
+      "rank": "Academy",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=lorenzo5",
+      "experiencePoints": 0
+    }
+  ],
+  "missions": [
+    {
+      "id": "m1",
+      "title": "Búsqueda del Gato Tora",
+      "description": "Encuentra y rescata al gato de la esposa del Daimyō del Fuego. El felino ha sido visto por última vez cerca del bosque sur.",
+      "rankRequirement": "D",
+      "reward": 500,
+      "status": "COMPLETADA"
+    },
+    {
+      "id": "m2",
+      "title": "Escolta al Constructor Tazuna",
+      "description": "Protege a Tazuna durante su viaje al País de las Olas mientras termina la construcción del Gran Puente Naruto.",
+      "rankRequirement": "C",
+      "reward": 5000,
+      "status": "EN_CURSO"
+    },
+    {
+      "id": "m3",
+      "title": "Infiltración en la Aldea de la Lluvia",
+      "description": "Obtén información sobre el líder de Akatsuki, Pain. Extrema precaución: territorio altamente peligroso.",
+      "rankRequirement": "S",
+      "reward": 100000,
+      "status": "EN_CURSO",
+      "updatedAt": "2026-01-26T10:38:20.043Z"
+    },
+    {
+      "id": "m4",
+      "title": "Recuperación del Pergamino Sagrado",
+      "description": "Unos ninjas renegados han robado un pergamino de sellado prohibido. Recupéralo antes de que crucen la frontera.",
+      "rankRequirement": "B",
+      "reward": 15000,
+      "status": "EN_CURSO",
+      "updatedAt": "2026-01-26T10:33:48.838Z"
+    },
+    {
+      "id": "m5",
+      "title": "Capturar a Itachi Uchiha",
+      "description": "Localiza y captura al miembro de Akatsuki, Itachi Uchiha. Misión prioritaria para el Equipo Kakashi.",
+      "rankRequirement": "S",
+      "reward": 250000,
+      "status": "EN_CURSO"
+    },
+    {
+      "id": "m6",
+      "title": "Limpiar las Caras de los Hokage",
+      "description": "Un joven gamberro ha pintado las estatuas de piedra. Se requiere limpieza manual inmediata.",
+      "rankRequirement": "D",
+      "reward": 300,
+      "status": "DISPONIBLE",
+      "updatedAt": "2026-01-26T14:02:33.904Z"
+    },
+    {
+      "id": "m7",
+      "title": "Mantenimiento del Bosque de la Muerte",
+      "description": "Controlar la población de serpientes gigantes y asegurar que las trampas del examen Chunin estén desactivadas.",
+      "rankRequirement": "C",
+      "reward": 4500,
+      "status": "EN_CURSO",
+      "updatedAt": "2026-01-26T10:19:38.596Z"
+    },
+    {
+      "id": "m8",
+      "title": "Vigilancia en el Valle del Fin",
+      "description": "Patrullar la zona histórica tras informes de actividad sospechosa cerca de las estatuas de Madara y Hashirama.",
+      "rankRequirement": "B",
+      "reward": 12000,
+      "status": "EN_CURSO",
+      "updatedAt": "2026-01-26T12:33:17.117Z"
+    },
+    {
+      "id": "m9",
+      "title": "Defensa del Templo del Fuego",
+      "description": "Apoyar a los monjes ninja contra un ataque inminente de cazadores de recompensas.",
+      "rankRequirement": "A",
+      "reward": 45000,
+      "status": "EN_CURSO"
+    },
+    {
+      "id": "m10",
+      "title": "Supresión de Hidan y Kakuzu",
+      "description": "Interceptar al dúo 'Imortal' de Akatsuki que está devastando los puestos fronterizos del País del Fuego.",
+      "rankRequirement": "S",
+      "reward": 180000,
+      "status": "EN_CURSO"
+    },
+    {
+      "id": "m11",
+      "title": "Entrenamiento de Supervivencia",
+      "description": "Misión especial para Genins: conseguir los cascabeles del instructor antes del mediodía.",
+      "rankRequirement": "D",
+      "reward": 1000,
+      "status": "COMPLETADA"
+    },
+    {
+      "id": "m12",
+      "title": "Recolección de Hierbas Medicinales",
+      "description": "Buscar plantas curativas raras en las montañas para el Hospital de Konoha.",
+      "rankRequirement": "D",
+      "reward": 800,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m13",
+      "title": "Entrega de Documentos Secretos",
+      "description": "Llevar un mensaje urgente al Señor Feudal del País del Viento sin ser detectado.",
+      "rankRequirement": "C",
+      "reward": 6000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m14",
+      "title": "Investigación de Guarida de Orochimaru",
+      "description": "Explorar una posible base abandonada de Orochimaru en el País de los Campos de Arroz.",
+      "rankRequirement": "A",
+      "reward": 60000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m15",
+      "title": "Detener Bandidos en el Puente Tenchi",
+      "description": "Un grupo de bandidos está asaltando a los viajeros. Neutralizad la amenaza y proteged a los civiles.",
+      "rankRequirement": "B",
+      "reward": 18000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m16",
+      "title": "Protección de la Princesa del País de la Nieve",
+      "description": "Actuar como guardaespaldas de la actriz Yukie Fujikaze durante el rodaje de su nueva película.",
+      "rankRequirement": "A",
+      "reward": 75000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m17",
+      "title": "Ayuda en la Granja del Viejo Takobe",
+      "description": "Ayudar a cosechar el arroz antes de que llegue la temporada de lluvias.",
+      "rankRequirement": "D",
+      "reward": 400,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m18",
+      "title": "Rastreo de Espía Infiltrado",
+      "description": "Se ha detectado chakra desconocido dentro de los muros. Localizad al intruso inmediatamente.",
+      "rankRequirement": "B",
+      "reward": 20000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m19",
+      "title": "Diplomacia con la Aldea de la Arena",
+      "description": "Entregar un tratado de paz renovado al Kazekage Gaara.",
+      "rankRequirement": "C",
+      "reward": 8000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m20",
+      "title": "Enfrentamiento con los Siete Espadachines",
+      "description": "Un miembro de los Siete Espadachines de la Niebla ha sido avistado. Nivel de amenaza extremo.",
+      "rankRequirement": "S",
+      "reward": 300000,
+      "status": "DISPONIBLE"
+    },
+    {
+      "id": "m21",
+      "title": "Pasear al Perro Inuzuka",
+      "description": "El perro de Kiba necesita ejercicio extra mientras él está en una misión de largo alcance.",
+      "rankRequirement": "D",
+      "reward": 200,
+      "status": "DISPONIBLE"
+    }
+  ],
+  "assignments": [
+    {
+      "missionId": "m1",
+      "ninjaId": "1",
+      "assignedAt": "2024-01-20T10:00:00Z",
+      "reportText": "Gato capturado. Arañazos leves.",
+      "evidenceImageUrl": "https://static.wikia.nocookie.net/naruto/images/0/0e/Tora.png"
+    },
+    {
+      "missionId": "m2",
+      "ninjaId": "sakura_id",
+      "assignedAt": "2024-01-21T09:00:00Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m5",
+      "ninjaId": "sasuke_id",
+      "assignedAt": "2024-01-22T08:00:00Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m9",
+      "ninjaId": "kakashi_id",
+      "assignedAt": "2024-01-22T12:00:00Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m10",
+      "ninjaId": "5",
+      "assignedAt": "2026-01-26T08:02:52.395Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m11",
+      "ninjaId": "1",
+      "assignedAt": "2024-01-19T08:00:00Z",
+      "reportText": "Al final comimos todos juntos.",
+      "evidenceImageUrl": "https://static.wikia.nocookie.net/naruto/images/8/81/Bell_Test.png"
+    },
+    {
+      "missionId": "m7",
+      "ninjaId": "7",
+      "assignedAt": "2026-01-26T10:19:38.596Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m4",
+      "ninjaId": "7",
+      "assignedAt": "2026-01-26T10:33:48.838Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m3",
+      "ninjaId": "7",
+      "assignedAt": "2026-01-26T10:38:20.043Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    },
+    {
+      "missionId": "m8",
+      "ninjaId": "7",
+      "assignedAt": "2026-01-26T12:33:17.117Z",
+      "reportText": null,
+      "evidenceImageUrl": null
+    }
+  ]
+}
