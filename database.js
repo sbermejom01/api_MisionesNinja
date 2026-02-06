@@ -1,57 +1,41 @@
-const fs = require('fs');
-const path = require('path');
+const { Pool } = require('pg');
 
-// En Vercel, el sistema de archivos es de solo lectura excepto /tmp
-const isVercel = process.env.VERCEL || process.env.NOW_REGION;
-const DATA_FILE = isVercel
-    ? path.join('/tmp', 'data.json')
-    : path.join(__dirname, 'data.json');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
-// Función para asegurar que el archivo existe en /tmp al iniciar
-const initializeDataFile = () => {
-    if (isVercel && !fs.existsSync(DATA_FILE)) {
-        try {
-            const originalPath = path.join(__dirname, 'data.json');
-            if (fs.existsSync(originalPath)) {
-                const initialData = fs.readFileSync(originalPath, 'utf8');
-                fs.writeFileSync(DATA_FILE, initialData, 'utf8');
-                console.log('Archivo data.json inicializado en /tmp');
-            } else {
-                const defaultData = { ninjas: [], missions: [], assignments: [] };
-                fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData, null, 2), 'utf8');
-                console.log('Archivo data.json creado de cero en /tmp');
-            }
-        } catch (error) {
-            console.error('Error inicializando data.json en /tmp:', error);
-        }
-    }
-};
+module.exports = pool;
 
-initializeDataFile();
+/*
+CREATE TABLE ninjas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  rank TEXT NOT NULL DEFAULT 'Academy',
+  avatar_url TEXT,
+  experience_points INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
-const readData = () => {
-    try {
-        if (!fs.existsSync(DATA_FILE)) {
-            return { ninjas: [], missions: [], assignments: [] };
-        }
-        const content = fs.readFileSync(DATA_FILE, 'utf8');
-        return JSON.parse(content);
-    } catch (error) {
-        console.error('Error reading data:', error);
-        return { ninjas: [], missions: [], assignments: [] };
-    }
-};
+CREATE TABLE missions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  rank_requirement TEXT NOT NULL,
+  reward INT NOT NULL,
+  status TEXT DEFAULT 'DISPONIBLE',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
+);
 
-const writeData = (data) => {
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-    } catch (error) {
-        console.error('Error writing data:', error);
-    }
-};
+CREATE TABLE assignments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  mission_id UUID REFERENCES missions(id) ON DELETE CASCADE,
+  ninja_id UUID REFERENCES ninjas(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMP DEFAULT NOW(),
+  report_text TEXT,
+  evidence_image_url TEXT
+);
 
-module.exports = {
-    readData,
-    writeData
-};
-
+*/ 

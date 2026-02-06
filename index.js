@@ -3,8 +3,8 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 require('dotenv').config();
 
-const { readData, writeData } = require('./database');
 const { authMiddleware, generateToken } = require('./auth');
+const pool = require('./database');
 
 const app = express();
 app.use(express.json());
@@ -33,37 +33,36 @@ app.post('/auth/register', async (req, res) => {
         return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    const data = readData();
-    const existingNinja = data.ninjas.find(n => n.username === username);
-
-    if (existingNinja) {
-        return res.status(400).json({ message: 'Ese nombre de ninja ya está en uso' });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    const newNinja = {
-        id: (data.ninjas.length + 1).toString(),
-        username,
-        passwordHash,
-        rank: RANKS.includes(rank) ? rank : 'Academy',
-        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
-        experiencePoints: 0
-    };
-
-    data.ninjas.push(newNinja);
-    writeData(data);
-
-    const token = generateToken(newNinja);
-    res.status(201).json({
-        token,
-        ninja: {
-            id: newNinja.id,
-            username: newNinja.username,
-            rank: newNinja.rank,
-            experiencePoints: newNinja.experiencePoints,
-            avatarUrl: newNinja.avatarUrl
+    try {
+        const exists = await pool.query(
+            'SELECT id FROM ninjas WHERE username = $1',
+            [username]
+        );
+        if (exists.rowCount > 0) {
+            return res.status(400).json({ message: 'Ese nombre de ninja ya está en uso' });
         }
-    });
+
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+
+        const result = await pool.query(
+            `INSERT INTO ninjas (username, password_hash, rank, avatar_url)
+             VALUES ($1, $2, $3, $4)
+             RETURNING id, username, rank, experience_points, avatar_url`,
+            [username, passwordHash, RANKS.includes(rank) ? rank : 'Academy', avatarUrl]
+        );
+
+        const ninja = result.rows[0];
+
+        const token = generateToken(ninja);
+
+        res.status(201).json({ token, ninja });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al registrar ninja' });
+    }
 });
 
 app.post('/auth/login', async (req, res) => {
