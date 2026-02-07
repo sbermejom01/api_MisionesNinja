@@ -114,154 +114,181 @@ app.post('/auth/login', async (req, res) => {
 });
 
 // --- Missions Routes ---
-app.get('/missions', authMiddleware, (req, res) => {
-    const { rank, status, page = 1, limit = 50 } = req.query;
-    const data = readData();
-    let missions = data.missions;
+app.get('/missions', authMiddleware, async (req, res) => {
+    try {
+        const { rank, status } = req.query;
+        
+        let query = `
+            SELECT m.*, 
+                   n.username as "acceptedByNinjaName", 
+                   n.avatar_url as "acceptedByNinjaAvatar"
+            FROM missions m
+            LEFT JOIN assignments a ON m.id = a.mission_id
+            LEFT JOIN ninjas n ON a.ninja_id = n.id
+            WHERE 1=1
+        `;
+        
+        const params = [];
+        let paramCount = 1;
 
-    if (rank) missions = missions.filter(m => m.rankRequirement === rank);
-    if (status) missions = missions.filter(m => m.status === status);
-
-    const startIndex = (page - 1) * limit;
-    const paginatedMissions = missions.slice(startIndex, startIndex + Number(limit));
-
-    const enrichedMissions = paginatedMissions.map(mission => {
-        const assignment = data.assignments.find(a => a.missionId === mission.id);
-        if (assignment) {
-            const ninja = data.ninjas.find(n => n.id === assignment.ninjaId);
-            return {
-                ...mission,
-                acceptedByNinjaName: ninja ? ninja.username : 'Ninja Desconocido',
-                acceptedByNinjaAvatar: ninja ? ninja.avatarUrl : null
-            };
+        if (rank) {
+            query += ` AND m.rank_requirement = $${paramCount}`;
+            params.push(rank);
+            paramCount++;
         }
-        return mission;
-    });
 
-    res.json({
-        total: missions.length,
-        page: Number(page),
-        limit: Number(limit),
-        data: enrichedMissions
-    });
-});
-
-
-app.patch('/missions/:id/accept', authMiddleware, (req, res) => {
-    const { id } = req.params;
-    const data = readData();
-    const mission = data.missions.find(m => m.id === id);
-
-    if (!mission) return res.status(404).json({ message: 'Misión no encontrada' });
-    if (mission.status !== 'DISPONIBLE') return res.status(400).json({ message: 'La misión ya no está disponible' });
-
-    // Rank validation: Ninja rank must be >= mission rank index? 
-    // Usually: D (0), C (1), B (2), A (3), S (4)
-    // Academy (0) -> can do D? Let's say yes.
-    // Genin (1) -> can do D, C.
-    // Chunin (2) -> can do D, C, B.
-    // Jonin (3) -> can do D, C, B, A.
-    // Kage (4) -> can do all.
-
-    const ninjaRankVal = rankToValue(req.ninja.rank);
-    const missionRankVal = missionRankToValue(mission.rankRequirement);
-
-    if (ninjaRankVal < missionRankVal) {
-        return res.status(403).json({ message: 'Tu rango es insuficiente para esta misión' });
-    }
-
-    mission.status = 'EN_CURSO';
-    mission.updatedAt = new Date().toISOString();
-
-    data.assignments.push({
-        missionId: id,
-        ninjaId: req.ninja.id,
-        assignedAt: new Date().toISOString(),
-        reportText: null,
-        evidenceImageUrl: null
-    });
-
-    writeData(data);
-    writeData(data);
-    res.json({ message: 'Misión aceptada', mission });
-});
-
-app.delete('/missions/:id/abandon', authMiddleware, (req, res) => {
-    const { id } = req.params;
-    const data = readData();
-
-    // Find assignment for this ninja and mission
-    const assignmentIndex = data.assignments.findIndex(a => a.missionId === id && a.ninjaId === req.ninja.id);
-    if (assignmentIndex === -1) {
-        return res.status(404).json({ message: 'No estás asignado a esta misión o no existe' });
-    }
-
-    // Check if mission is already completed (cannot abandon completed missions)
-    const mission = data.missions.find(m => m.id === id);
-    if (mission && mission.status === 'COMPLETADA') {
-        return res.status(400).json({ message: 'No puedes abandonar una misión completada' });
-    }
-
-    // Remove assignment
-    data.assignments.splice(assignmentIndex, 1);
-
-    // Reset mission status to DISPONIBLE
-    if (mission) {
-        mission.status = 'DISPONIBLE';
-        mission.updatedAt = new Date().toISOString();
-    }
-
-    writeData(data);
-    res.json({ message: 'Misión abandonada. Has deshonrado a tu clan... pero la misión está libre de nuevo.', mission });
-});
-
-app.post('/missions/:id/report', authMiddleware, (req, res) => {
-    const { id } = req.params;
-    const { reportText, evidenceImageUrl } = req.body; // Simulating multipart/base64 via direct field
-    const data = readData();
-
-    const assignment = data.assignments.find(a => a.missionId === id && a.ninjaId === req.ninja.id);
-    if (!assignment) return res.status(404).json({ message: 'No estás asignado a esta misión' });
-
-    const mission = data.missions.find(m => m.id === id);
-    mission.status = 'COMPLETADA';
-    mission.updatedAt = new Date().toISOString();
-
-    assignment.reportText = reportText;
-    assignment.evidenceImageUrl = evidenceImageUrl;
-
-    // Award experience
-    const ninja = data.ninjas.find(n => n.id === req.ninja.id);
-    const expGain = mission.reward / 10; // Simple logic: 10% of reward as XP
-    ninja.experiencePoints += expGain;
-
-    writeData(data);
-    res.json({ message: 'Reporte enviado con éxito', experienceGained: expGain });
-});
-
-// --- Ninja Stats ---
-app.get('/ninjas/me/stats', authMiddleware, (req, res) => {
-    const data = readData();
-    const ninja = data.ninjas.find(n => n.id === req.ninja.id);
-    const myAssignments = data.assignments.filter(a => a.ninjaId === req.ninja.id);
-
-    // Aggregated stats
-    const completedCount = data.missions.filter(m =>
-        myAssignments.some(a => a.missionId === m.id) && m.status === 'COMPLETADA'
-    ).length;
-
-    res.json({
-        profile: {
-            username: ninja.username,
-            rank: ninja.rank,
-            experience: ninja.experiencePoints,
-            avatar: ninja.avatarUrl
-        },
-        stats: {
-            totalAssignments: myAssignments.length,
-            completedMissions: completedCount
+        if (status) {
+            query += ` AND m.status = $${paramCount}`;
+            params.push(status);
+            paramCount++;
         }
-    });
+
+        query += ` ORDER BY m.created_at DESC`;
+
+        const result = await pool.query(query, params);
+        
+        const formattedMissions = result.rows.map(row => ({
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            rankRequirement: row.rank_requirement,
+            reward: row.reward,
+            status: row.status,
+            acceptedByNinjaName: row.acceptedByNinjaName,
+            acceptedByNinjaAvatar: row.acceptedByNinjaAvatar
+        }));
+
+        res.json({ data: formattedMissions });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al obtener misiones' });
+    }
+});
+
+app.patch('/missions/:id/accept', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        const missionRes = await client.query('SELECT * FROM missions WHERE id = $1', [id]);
+        if (missionRes.rowCount === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ message: 'Misión no encontrada' });
+        }
+        const mission = missionRes.rows[0];
+
+        if (mission.status !== 'DISPONIBLE') {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ message: 'La misión ya no está disponible' });
+        }
+
+        const ninjaRankVal = rankToValue(req.ninja.rank);
+        const missionRankVal = missionRankToValue(mission.rank_requirement);
+
+        if (ninjaRankVal < missionRankVal) {
+            await client.query('ROLLBACK');
+            return res.status(403).json({ message: 'Tu rango es insuficiente' });
+        }
+
+        await client.query("UPDATE missions SET status = 'EN_CURSO', updated_at = NOW() WHERE id = $1", [id]);
+
+        await client.query(
+            "INSERT INTO assignments (mission_id, ninja_id) VALUES ($1, $2)",
+            [id, req.ninja.id]
+        );
+
+        await client.query('COMMIT');
+        res.json({ message: 'Misión aceptada' });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ message: 'Error al aceptar misión' });
+    } finally {
+        client.release();
+    }
+});
+
+app.post('/missions/:id/report', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const { reportText, evidenceImageUrl } = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        const assignRes = await client.query(
+            'SELECT * FROM assignments WHERE mission_id = $1 AND ninja_id = $2', 
+            [id, req.ninja.id]
+        );
+        
+        if (assignRes.rowCount === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ message: 'No estás asignado a esta misión' });
+        }
+
+        const missionRes = await client.query('SELECT reward FROM missions WHERE id = $1', [id]);
+        const reward = missionRes.rows[0].reward;
+
+        await client.query("UPDATE missions SET status = 'COMPLETADA', updated_at = NOW() WHERE id = $1", [id]);
+
+        await client.query(
+            "UPDATE assignments SET report_text = $1, evidence_image_url = $2 WHERE mission_id = $3",
+            [reportText, evidenceImageUrl, id]
+        );
+
+        const xpGain = Math.floor(reward / 10);
+        await client.query(
+            "UPDATE ninjas SET experience_points = experience_points + $1 WHERE id = $2",
+            [xpGain, req.ninja.id]
+        );
+
+        await client.query('COMMIT');
+        res.json({ message: 'Reporte enviado', experienceGained: xpGain });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ message: 'Error al enviar reporte' });
+    } finally {
+        client.release();
+    }
+});
+
+app.get('/ninjas/me/stats', authMiddleware, async (req, res) => {
+    try {
+        const ninjaRes = await pool.query('SELECT * FROM ninjas WHERE id = $1', [req.ninja.id]);
+        const ninja = ninjaRes.rows[0];
+
+        const totalAssignRes = await pool.query('SELECT COUNT(*) FROM assignments WHERE ninja_id = $1', [req.ninja.id]);
+        
+        const completedRes = await pool.query(`
+            SELECT COUNT(*) 
+            FROM assignments a 
+            JOIN missions m ON a.mission_id = m.id 
+            WHERE a.ninja_id = $1 AND m.status = 'COMPLETADA'
+        `, [req.ninja.id]);
+
+        res.json({
+            profile: {
+                username: ninja.username,
+                rank: ninja.rank,
+                experiencePoints: ninja.experience_points,
+                avatarUrl: ninja.avatar_url
+            },
+            stats: {
+                totalAssignments: parseInt(totalAssignRes.rows[0].count),
+                completedMissions: parseInt(completedRes.rows[0].count)
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al obtener stats' });
+    }
 });
 
 const server = app.listen(PORT, () => {
