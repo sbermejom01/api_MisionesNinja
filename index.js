@@ -8,7 +8,16 @@ const pool = require('./database');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:8100',
+    'http://localhost:4200',
+    'https://pr-5-misiones-ninja.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -66,30 +75,46 @@ app.post('/auth/register', async (req, res) => {
 });
 
 app.post('/auth/login', async (req, res) => {
-    const { username, password } = req.body;
-    const data = readData();
-    const ninja = data.ninjas.find(n => n.username === username);
+  const { username, password } = req.body;
 
-    if (!ninja) {
-        return res.status(401).json({ message: 'Usuario no encontrado' });
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Faltan credenciales' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT id, username, password_hash, rank, experience_points, avatar_url FROM ninjas WHERE username = $1',
+      [username]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
     }
 
-    const isValid = await bcrypt.compare(password, ninja.passwordHash);
+    const ninja = result.rows[0];
+
+    const isValid = await bcrypt.compare(password, ninja.password_hash);
     if (!isValid) {
-        return res.status(401).json({ message: 'Contraseña incorrecta' });
+      return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
     const token = generateToken(ninja);
+
     res.json({
-        token,
-        ninja: {
-            id: ninja.id,
-            username: ninja.username,
-            rank: ninja.rank,
-            experiencePoints: ninja.experiencePoints || 0,
-            avatarUrl: ninja.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${ninja.username}`
-        }
+      token,
+      ninja: {
+        id: ninja.id,
+        username: ninja.username,
+        rank: ninja.rank,
+        experiencePoints: ninja.experience_points,
+        avatarUrl: ninja.avatar_url
+      }
     });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error en el login' });
+  }
 });
 
 // --- Missions Routes ---
