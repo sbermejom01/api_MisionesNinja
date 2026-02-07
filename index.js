@@ -7,19 +7,29 @@ const { authMiddleware, generateToken } = require('./auth');
 const pool = require('./database');
 
 const app = express();
+const whitelist = [
+  'http://localhost:8100',
+  'http://localhost:4200',
+  'https://pr-5-misiones-ninja.vercel.app'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Bloqueado por CORS: Tu aldea no tiene permiso'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
-app.use(cors({
-  origin: [
-    'http://localhost:8100',
-    'http://localhost:4200',
-    'https://pr-5-misiones-ninja.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.options('*', (req, res) => {
-  res.sendStatus(200);
-});
 
 const PORT = process.env.PORT || 3000;
 
