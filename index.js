@@ -166,6 +166,33 @@ app.get('/missions', authMiddleware, async (req, res) => {
     }
 });
 
+app.get('/missions/:id', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM missions WHERE id = $1', [id]);
+        
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Misión no encontrada' });
+        }
+
+        const mission = result.rows[0];
+        
+        const formattedMission = {
+            id: mission.id,
+            title: mission.title,
+            description: mission.description,
+            rankRequirement: mission.rank_requirement,
+            reward: mission.reward,
+            status: mission.status
+        };
+
+        res.json(formattedMission);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error al obtener la misión' });
+    }
+});
+
 app.patch('/missions/:id/accept', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const client = await pool.connect();
