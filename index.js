@@ -17,6 +17,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors());
 
 
 const PORT = process.env.PORT || 3000;
