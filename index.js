@@ -17,13 +17,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors());
-
+app.options('*', (req, res) => {
+  res.sendStatus(200);
+});
 
 const PORT = process.env.PORT || 3000;
 
 app.get("/api", (req, res) => {
-  res.json({ mensaje: "API funcionando en Vercel 🚀" });
+  res.json({ mensaje: "API funcionando en Vercel" });
 });
 
 module.exports = app;
