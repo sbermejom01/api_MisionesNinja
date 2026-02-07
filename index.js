@@ -170,13 +170,13 @@ app.get('/missions/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
         const query = `
-            SELECT m.*, a.report_text, a.evidence_image_url
+            SELECT m.*, a.report_text, a.evidence_image_url, a.ninja_id
             FROM missions m
-            LEFT JOIN assignments a ON m.id = a.mission_id AND a.ninja_id = $2
+            LEFT JOIN assignments a ON m.id = a.mission_id
             WHERE m.id = $1
         `;
         
-        const result = await pool.query(query, [id, req.ninja.id]);
+        const result = await pool.query(query, [id]);
         
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Misión no encontrada' });
@@ -192,7 +192,8 @@ app.get('/missions/:id', authMiddleware, async (req, res) => {
             reward: row.reward,
             status: row.status,
             reportText: row.report_text,
-            evidenceImageUrl: row.evidence_image_url
+            evidenceImageUrl: row.evidence_image_url,
+            assignedNinjaId: row.ninja_id
         };
 
         res.json(formattedMission);
